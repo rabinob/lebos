@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/> -->
+<title>Lebos construction site map</title>
+<style>
+html, body {width:  100%; height: 100%; margin: 0px; font-family: Tahoma, Geneva, Arial, sans-serif;}
+#header {position: fixed; width: 100%; height: 35px; background: #333; color: white;}
+#container {position: fixed; width: 100%; top:35px; bottom: 35px; overflow: auto;}
+#footer {position: fixed; width: 100%; height: 35px; bottom: 0px; background: #333; color: white;}
+
+#mapSwitcher {position:absolute; width: 100%; padding-left: 50%;}
+#leftPane {position:absolute; width:20%; height:100%; top:0; left: 0; background: #333;}
+#tagContainer {position:absolute; width:100%; height:100%; top:0; left: 0; background: #333; overflow-y:scroll;}
+#mapContainer {position:absolute; top:0; right:0; width:80%; height:100%;}
+#show2DMap {position: absolute; bottom: 10px; left: 10px; }
+#show3DMap {position: absolute; bottom: 10px; left: 90px; }
+.mapSwitcherButton {border-radius:5px; border-width:1px; width: 70px; border-color: #666666;}
+.mapPanel {position:absolute; width:100%; height:100%;}
+canvas { width: 100%; height: 100% }
+#zoomIn {position: absolute; top: 5px; left: 5px; }
+#zoomOut {position: absolute; top: 55px; left: 5px; }
+#rotateCW {position: absolute; top: 5px; left: 55px; }
+#rotateCCW {position: absolute; top: 55px; left: 55px; }
+#drawer {position: absolute; top: 50%; left: 0px; }
+#LogoSlogan {position: absolute; bottom: 10px; right: 10px; }
+.inputContainer {position: absolute; padding:3px; margin: 3px; width: 200px; height: 20px; -webkit-border-radius:4px;
+ -moz-border-radius:4px; border-radius:4px; -webkit-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset; -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
+  box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset; background: #f8f8f8; border:none; outline:none;}
+
+#tagIDFilter { left: 210px; }
+#tagFieldFilter { left: 420px; }
+#tagSortButton {position: absolute; left: 630px; padding:3px; margin: 3px; height: 30px; -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; background: #f8f8f8; border:1px solid #aaa; outline:none;}
+#coordSysContainer {  }
+#coordSysSelect { position: absolute; right: 2px; border:none; outline:none; background: inherit; width: 80%; cursor:pointer;}
+
+
+#notificationBar {position: absolute; top: 90%; left: 0px; width: 100%; height: 40px; background: rgba(255,0,0,0.6); color:white; text-align: center; line-height: 35px; display:none; font-size:25px}
+
+.tagRow {color: white; padding: 3px 3px 3px 5px; }
+.tagLabel {color: #aaaaaa; font-weight:bold;}
+.tagInfoRow {background: #444; margin-left: 5px; padding-left: 5px; border-left-color: #00CCFF; border-width: 0px 0px 0px 5px; border-style: solid;}
+.tagLocationRow {background: #444; margin-left: 5px; padding-left: 5px; border-left-color: #77DD77; border-width: 0px 0px 0px 5px; border-style: solid;}
+.colorbox { float: left; width: 13px; height: 13px; background: red; margin: 2px 5px 0px 0px;
+border-radius: 50%;  border-width: 2px; border-style: solid; /* animation: border-pulsate 2s infinite; */}
+
+#buttons {position:absolute; width: 100%; text-align:center; z-index:1000;}
+button { font-family:georgia; background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer; border-radius:5px; border-width:1px; border-color: #666666; z-index:1000; }
+button:hover { background:#333 }
+button.selected { background:#333 }
+
+#mapPanel canvas {
+    -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: fadein 2s; /* Firefox < 16 */
+        -ms-animation: fadein 2s; /* Internet Explorer */
+         -o-animation: fadein 2s; /* Opera < 12.1 */
+            animation: fadein 2s;
+}
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+</style>
+
+
+</head>
+<body>
+  <div id='header'>
+<a href="."><img src='images/lebos.png' style="height:30px; margin:3px;"></img></a>
+  </div>
+  <div id="container">
+    <div id="leftPane">
+      <div id="tagContainer"></div>
+    </div>
+
+    <div id="mapContainer">
+      <div id="mapPanel" class="mapPanel"></div>
+      <img id="LogoSlogan" src="../images/lebos.png"></img> 
+      <img id="zoomIn" src="images/zoomInButton.png"></img> 
+      <img id="zoomOut" src="images/zoomOutButton.png"></img>
+      <img id="rotateCW" src="images/rotateCWButton.png"></img> 
+      <img id="rotateCCW" src="images/rotateCCWButton.png"></img> 
+      <img id="drawer" src="images/drawerHandle.png" ></img>
+      <div id="notificationBar"></div>
+	  <button id="show2DMap" class="mapSwitcherButton"><img src="images/2DIcon.png"></img></button>
+	  <button id="show3DMap" class="mapSwitcherButton"><img src="images/3DIcon.png"></img></button>
+    </div>
+  </div>
+  
+  <div id="footer">
+    <div id="coordSysContainer" class="inputContainer">
+      <img src="../images/coordinateSystemIcon.png" />
+      <select id="coordSysSelect">
+      </select>
+    </div>
+  
+    <input id="tagIDFilter" type="text" placeholder="Filter by name/id" class="inputContainer"></input>
+    <input id="tagFieldFilter" type="text" placeholder="Filter tag fields" class="inputContainer"></input>
+    <input id="tagSortButton" type="button" value="Sort tree" />
+  </div>
+
+<script type="text/javascript" src="lib/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="lib/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="lib/dat.gui.min.js"></script>
+<script type="text/javascript" src="lib/Three-r75.js"></script>
+<script type="text/javascript" src="settings.js"></script>
+<script type="text/javascript" src="map2D/Map2DInteractionManager.js"></script>
+<script type="text/javascript" src="SelectionManager.js"></script>
+<script type="text/javascript" src="NotificationManager.js"></script>
+<script type="text/javascript" src="filtering/TagFilter.js"></script>
+<script type="text/javascript" src="filtering/KeywordTagFilter.js"></script>
+<script type="text/javascript" src="filtering/CoordinateSystemTagFilter.js"></script>
+<script type="text/javascript" src="map2D/Map2DController.js"></script>
+<script type="text/javascript" src="map3D/Map3DController.js"></script>
+<script type="text/javascript" src="TreeController.js"></script>
+<script type="text/javascript" src="map2D/Viewport.js"></script>
+<script type="text/javascript" src="map2D/GridDrawable.js"></script>
+<script type="text/javascript" src="map2D/PolygonDrawable.js"></script>
+<script type="text/javascript" src="map2D/TagDrawable.js"></script>
+<script type="text/javascript" src="map2D/BackgroundImageDrawable.js"></script>
+<script type="text/javascript" src="map2D/InactiveAreaRendererDrawable.js"></script>
+<script type="text/javascript" src="map3D/DomeControls.js"></script>
+<script type="text/javascript" src="map3D/Stats.js"></script>
+<script type="text/javascript" src="TagDataRetriever.js"></script>
+<script type="text/javascript" src="map2D/Map2D.js"></script>
+<script type="text/javascript" src="main.js"></script>
+
+
+<script>
+  $(document).ready(main);
+</script>
+
+</body>
+</html>

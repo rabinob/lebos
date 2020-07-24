@@ -1,0 +1,15 @@
+{
+	"ThisIsComment": "This JSON file allows you to override properties of objects coming via the getProjectInfo and getTagInfo requests, such as object visibility or color. Each object key below is the object id found in Quuppa Site Planner tool id field, except for tag also tag name can be used here. To match a group of objects, use prefix eg. Zone as the key.",
+	"dummyZone011" : {
+		"visible": false
+	},
+	"dummyZone014" : {
+		"color": "#ffffffff"
+	},
+	"dummyBackground001" : {
+		"visible": false
+	},
+	"dummyTagNameOrId": {
+		"imageSrc": "../images/shoppingBasket.png"
+	}
+}
